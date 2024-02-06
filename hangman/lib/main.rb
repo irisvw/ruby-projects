@@ -1,9 +1,12 @@
+# Hangman!
 class Game
   def initialize
     @dictionary = File.readlines('dictionary.txt', chomp: true)
     @secret_word = ''
     @guesses = []
-    @remaining_letters = %w[a b c d e f g h i j k l m n o p q r s t u v w x y z]
+    @remaining_letters = ('a'..'z').to_a
+    @remaining_guesses = 6
+    @gameloop = true
   end
 
   def set_secret_word
@@ -13,28 +16,30 @@ class Game
 
   def play
     set_secret_word
-    loop do
+    while @gameloop
       letter = guess
       evaluate_guess(letter)
-      # display results
+      display_results
+      check_victory
+      check_loss
     end
   end
 
   def evaluate_guess(letter)
-    return "Doesn't occur." unless @secret_word.include?(letter)
-
-    # take letter that player guessed
-    # check if any letters in secret word match the letter, and on which positions
-    arr = @secret_word.split('')
-    occurrences = arr.each_with_index.filter_map { |element, index| index if element == letter }
-    occurrences.each { |index| @progress[index] = letter }
-    # update progress with correct letters
+    if @secret_word.include?(letter)
+      arr = @secret_word.split('')
+      occurrences = arr.each_with_index.filter_map { |element, index| index if element == letter }
+      occurrences.each { |index| @progress[index] = letter }
+    else
+      @remaining_guesses -= 1
+      @guesses << letter
+    end
   end
 
   def display_results
-    # puts progress
-    # puts remaining guesses
-    # puts incorrect letters
+    puts @progress.join(' ')
+    puts "Remaining guesses: #{@remaining_guesses}"
+    puts "Incorrect guesses: #{@guesses.sort}"
   end
 
   def guess
@@ -48,6 +53,20 @@ class Game
         puts 'Invalid guess.'
       end
     end
+  end
+
+  def check_loss
+    return unless @remaining_guesses <= 0
+
+    puts 'No more guesses remaining. You lose.'
+    @gameloop = false
+  end
+
+  def check_victory
+    return unless @secret_word == @progress.join('')
+
+    puts 'Congratulations! You guessed the secret word.'
+    @gameloop = false
   end
 end
 
