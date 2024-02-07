@@ -1,0 +1,41 @@
+---
+:secret_word: afghanistan
+:progress:
+- a
+- _
+- _
+- _
+- a
+- "n"
+- _
+- _
+- _
+- a
+- "n"
+:guesses:
+- e
+- l
+- o
+- m
+:remaining_letters:
+- b
+- c
+- d
+- f
+- g
+- h
+- i
+- j
+- k
+- p
+- q
+- r
+- s
+- t
+- u
+- v
+- w
+- x
+- "y"
+- z
+:remaining_guesses: 2

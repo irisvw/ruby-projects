@@ -1,27 +1,64 @@
+require 'yaml'
+require 'date'
+
 # Hangman!
-class Game
-  def initialize
+class Hangman
+  def initialize(secret_word = '', progress = '', guesses = [], remaining_letters = ('a'..'z').to_a, remaining_guesses = 6)
     @dictionary = File.readlines('dictionary.txt', chomp: true)
-    @secret_word = ''
-    @guesses = []
-    @remaining_letters = ('a'..'z').to_a
-    @remaining_guesses = 6
+    @secret_word = secret_word
+    @progress = progress
+    @guesses = guesses
+    @remaining_letters = remaining_letters
+    @remaining_guesses = remaining_guesses
     @gameloop = true
   end
 
-  def set_secret_word
-    @secret_word = @dictionary.select { |element| element.length.between?(4, 13) }.sample
-    @progress = Array.new(@secret_word.length, '_')
-  end
-
   def play
+    setup
     set_secret_word
+
     while @gameloop
       letter = guess
       evaluate_guess(letter)
       display_results
       check_victory
       check_loss
+    end
+  end
+
+  def setup
+    return unless @secret_word == ''
+
+    puts 'Welcome to Hangman! Entering any key will start a new game, while entering LOAD will display your saved games.'
+    input = gets.chomp.downcase
+
+    if input == 'load'
+      get_save
+      puts 'No saved games found. Starting a new one!'
+    end
+  end
+
+  def set_secret_word
+    return unless @secret_word == ''
+
+    @secret_word = @dictionary.select { |element| element.length.between?(4, 13) }.sample
+    @progress = Array.new(@secret_word.length, '_')
+    puts @progress.join(' ')
+  end
+
+  def guess
+    loop do
+      puts "Guess a letter (or enter 'save' to save the game)."
+      input = gets.chomp.downcase
+
+      if input.length == 1 && @remaining_letters.include?(input)
+        @remaining_letters.delete(input)
+        return input
+      elsif input == 'save'
+        save_game
+      else
+        puts 'Invalid guess.'
+      end
     end
   end
 
@@ -42,23 +79,10 @@ class Game
     puts "Incorrect guesses: #{@guesses.sort}"
   end
 
-  def guess
-    loop do
-      puts 'Guess a letter.'
-      input = gets.chomp.downcase
-      if input.length == 1 && @remaining_letters.include?(input)
-        @remaining_letters.delete(input)
-        return input
-      else
-        puts 'Invalid guess.'
-      end
-    end
-  end
-
   def check_loss
     return unless @remaining_guesses <= 0
 
-    puts 'No more guesses remaining. You lose.'
+    puts "No more guesses remaining. You lose. The secret word was '#{@secret_word}'."
     @gameloop = false
   end
 
@@ -68,7 +92,48 @@ class Game
     puts 'Congratulations! You guessed the secret word.'
     @gameloop = false
   end
+
+  def save_game
+    data = YAML.dump({
+      secret_word: @secret_word,
+      progress: @progress,
+      guesses: @guesses,
+      remaining_letters: @remaining_letters,
+      remaining_guesses: @remaining_guesses
+      })
+
+    datetime = Time.now.strftime("%Y%m%d_%H%M")
+    Dir.mkdir('saved') unless Dir.exist?('saved')
+    File.open("saved/#{datetime}.txt", 'w') do |f|
+      f.write(data)
+    end
+  end
+
+  def load_game(file)
+    data = YAML.load_file(file)
+    newgame = Hangman.new(data[:secret_word], data[:progress], data[:guesses], data[:remaining_letters], data[:remaining_guesses])
+    newgame.display_results
+    newgame.play
+  end
+
+  def get_save
+    puts 'Saved games:'
+    list = {}
+    Dir.glob('saved/*.txt').each_with_index {|save, index| list[index] = save }
+    return if list == {} 
+
+    list.each { |index, save| puts "#{index + 1}: #{File.basename(save, ".txt")}"}
+    puts 'Which save would you like to load?'
+    input = gets.chomp.to_i
+
+    while (list.has_key?(input - 1) == false)
+      puts 'Invalid input.'
+      input = gets.chomp.to_i
+    end
+
+    load_game(list[input - 1])
+  end
 end
 
-game = Game.new
+game = Hangman.new
 game.play
