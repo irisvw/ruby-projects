@@ -14,7 +14,6 @@ class Hangman
   end
 
   def play
-    setup
     set_secret_word
 
     while @gameloop
@@ -23,18 +22,6 @@ class Hangman
       display_results
       check_victory
       check_loss
-    end
-  end
-
-  def setup
-    return unless @secret_word == ''
-
-    puts 'Welcome to Hangman! Entering any key will start a new game, while entering LOAD will display your saved games.'
-    input = gets.chomp.downcase
-
-    if input == 'load'
-      get_save
-      puts 'No saved games found. Starting a new one!'
     end
   end
 
@@ -56,6 +43,7 @@ class Hangman
         return input
       elsif input == 'save'
         save_game
+        puts 'Save succesful!'
       else
         puts 'Invalid guess.'
       end
@@ -108,32 +96,52 @@ class Hangman
       f.write(data)
     end
   end
+end
 
-  def load_game(file)
-    data = YAML.load_file(file)
-    newgame = Hangman.new(data[:secret_word], data[:progress], data[:guesses], data[:remaining_letters], data[:remaining_guesses])
-    newgame.display_results
-    newgame.play
-  end
+def setup
+  puts 'Welcome to Hangman! Entering any key will start a new game, while entering LOAD will display your saved games.'
+  input = gets.chomp.downcase
 
-  def get_save
-    puts 'Saved games:'
-    list = {}
-    Dir.glob('saved/*.txt').each_with_index {|save, index| list[index] = save }
-    return if list == {} 
-
-    list.each { |index, save| puts "#{index + 1}: #{File.basename(save, ".txt")}"}
-    puts 'Which save would you like to load?'
-    input = gets.chomp.to_i
-
-    while (list.has_key?(input - 1) == false)
-      puts 'Invalid input.'
-      input = gets.chomp.to_i
-    end
-
-    load_game(list[input - 1])
+  if input == 'load'
+    get_save
+    # puts 'No saved games found. Starting a new one!'
+  else
+    new_game
   end
 end
 
-game = Hangman.new
-game.play
+def load_game(file)
+  data = YAML.load_file(file)
+  game = Hangman.new(data[:secret_word], data[:progress], data[:guesses], data[:remaining_letters], data[:remaining_guesses])
+  game.display_results
+  game.play
+end
+
+def get_save
+  puts 'Saved games:'
+  list = {}
+  Dir.glob('saved/*.txt').each_with_index {|save, index| list[index] = save }
+  if list == {}
+    puts 'No saved games found. Starting a new one!'
+    new_game
+    return
+  end
+
+  list.each { |index, save| puts "#{index + 1}: #{File.basename(save, ".txt")}"}
+  puts 'Which save would you like to load?'
+  input = gets.chomp.to_i
+
+  while (list.has_key?(input - 1) == false)
+    puts 'Invalid input.'
+    input = gets.chomp.to_i
+  end
+
+  load_game(list[input - 1])
+end
+
+def new_game
+  game = Hangman.new
+  game.play
+end
+
+setup

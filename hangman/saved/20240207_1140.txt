@@ -1,23 +1,15 @@
 ---
-:secret_word: afghanistan
+:secret_word: ties
 :progress:
-- a
 - _
 - _
-- _
-- a
-- "n"
-- _
-- _
-- _
-- a
-- "n"
-:guesses:
 - e
+- _
+:guesses:
 - l
-- o
-- m
+- p
 :remaining_letters:
+- a
 - b
 - c
 - d
@@ -27,7 +19,9 @@
 - i
 - j
 - k
-- p
+- m
+- "n"
+- o
 - q
 - r
 - s
@@ -38,4 +32,4 @@
 - x
 - "y"
 - z
-:remaining_guesses: 2
+:remaining_guesses: 4
