@@ -104,7 +104,6 @@ def setup
 
   if input == 'load'
     get_save
-    # puts 'No saved games found. Starting a new one!'
   else
     new_game
   end
