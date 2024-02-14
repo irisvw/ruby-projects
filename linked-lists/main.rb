@@ -2,7 +2,6 @@ class LinkedList
   # represents the full list
   def initialize
     @head = nil
-    @tail = nil
   end
 
   def append(value)
@@ -50,9 +49,11 @@ class LinkedList
 
   def tail
     # returns the last node in the list
-    return nil if @tail.nil?
+    return nil if @head.nil?
 
-    return @tail.value
+    current_node = @head
+    current_node = current_node.next_node until current_node.next_node.nil?
+    return current_node.value
   end
 
   def at(index)
@@ -219,8 +220,11 @@ puts "tests (insert_at) expect ( espeon ) -> ( glaceon ) -> ( umbreon ) -> ( jol
 my_list.insert_at("glaceon", 1)
 my_list.insert_at("jolteon", 3)
 p my_list.to_s
+puts ""
 
 puts "tests (remove_at) expect ( glaceon ) -> ( jolteon ) -> nil "
 my_list.remove_at(0)
 my_list.remove_at(1)
 p my_list.to_s
+
+p my_list.tail
