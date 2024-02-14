@@ -60,13 +60,10 @@ class LinkedList
     return nil if @head.nil?
 
     current_node = @head
-    count = 0
-    until count == index
+    while index > 0
       current_node = current_node.next_node
-      count += 1
-      if current_node.next_node.nil?
-        return nil
-      end
+      index -= 1
+      return nil if current_node.next_node.nil?
     end
     return current_node.value
   end
@@ -91,9 +88,7 @@ class LinkedList
     current_node = @head
     while current_node.value != value
       current_node = current_node.next_node
-      if current_node.next_node.nil?
-        return false
-      end
+      return false if current_node.next_node.nil?
     end
     return true
   end
@@ -107,9 +102,7 @@ class LinkedList
     while current_node.value != value
       current_node = current_node.next_node
       index += 1
-      if current_node.value != value && current_node.next_node.nil?
-        return nil
-      end
+      return nil if current_node.value != value && current_node.next_node.nil?
     end
     return index
   end
@@ -118,20 +111,49 @@ class LinkedList
     # ( value ) -> ( value ) -> ( value ) -> nil
     current_node = @head
     output = "( #{current_node.value} ) -> "
-    while true
+    while current_node.next_node.nil? == false
       current_node = current_node.next_node
       output << "( #{current_node.value} ) -> "
-      break if current_node.next_node.nil?
     end
     puts output
   end
 
   def insert_at(value, index)
     # inserts a new node with the provided value at the given index.
+    return nil if index > self.size
+
+    if index == 0
+      prepend(value)
+    else
+      current_node = @head
+      while index > 0
+        previous_node = current_node
+        current_node = current_node.next_node
+        index -= 1
+      end
+      new_node = Node.new(value)
+      previous_node.next_node = new_node
+      new_node.next_node = current_node
+    end
   end
 
   def remove_at(index)
     # removes the node at the given index.
+    return nil if index > self.size
+
+    current_node = @head
+
+    if index == 0
+      @head = current_node.next_node
+      return current_node
+    else
+      while index > 0
+        previous_node = current_node
+        current_node = current_node.next_node
+        index -= 1
+      end
+      previous_node.next_node = current_node.next_node
+    end
   end
 end
 
@@ -187,4 +209,18 @@ p my_list.size
 puts ""
 
 puts "tests (to_s) expect ( espeon ) -> ( umbreon ) -> nil"
+p my_list.to_s
+my_list.pop
+p my_list.to_s
+my_list.append("umbreon")
+puts ""
+
+puts "tests (insert_at) expect ( espeon ) -> ( glaceon ) -> ( umbreon ) -> ( jolteon ) -> nil "
+my_list.insert_at("glaceon", 1)
+my_list.insert_at("jolteon", 3)
+p my_list.to_s
+
+puts "tests (remove_at) expect ( glaceon ) -> ( jolteon ) -> nil "
+my_list.remove_at(0)
+my_list.remove_at(1)
 p my_list.to_s
