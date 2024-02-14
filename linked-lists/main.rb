@@ -8,10 +8,8 @@ class LinkedList
     # adds a new node containing value to the end of the list
     if @head.nil?
       @head = Node.new(value)
-      @tail = @head
     else
-      @tail.next_node = Node.new(value)
-      @tail = @tail.next_node
+      tail.next_node = Node.new(value)
     end
   end
 
@@ -19,7 +17,6 @@ class LinkedList
     # adds a new node containing value to the start of the list
     if @head.nil?
       @head = value
-      @tail = value
     else
       node = Node.new(value)
       node.next_node = @head
@@ -44,7 +41,7 @@ class LinkedList
     # returns the first node in the list
     return nil if @head.nil?
 
-    return @head.value
+    return @head
   end
 
   def tail
@@ -53,7 +50,7 @@ class LinkedList
 
     current_node = @head
     current_node = current_node.next_node until current_node.next_node.nil?
-    return current_node.value
+    return current_node
   end
 
   def at(index)
@@ -78,8 +75,7 @@ class LinkedList
       last_current_node = current_node
       current_node = current_node.next_node 
     end
-    @tail = last_current_node
-    @tail.next_node = nil
+    last_current_node.next_node = nil
   end
 
   def contains?(value)
@@ -110,11 +106,19 @@ class LinkedList
 
   def to_s
     # ( value ) -> ( value ) -> ( value ) -> nil
+    return if @head.nil?
+
     current_node = @head
     output = "( #{current_node.value} ) -> "
-    while current_node.next_node.nil? == false
-      current_node = current_node.next_node
-      output << "( #{current_node.value} ) -> "
+    loop do
+      if current_node.next_node.nil?
+        output << "nil"
+        puts output
+        return
+      else
+        current_node = current_node.next_node
+        output << "( #{current_node.value} ) -> "
+      end
     end
     puts output
   end
@@ -166,6 +170,10 @@ class Node
     @next_node = nil
     @value = value
   end
+
+  def to_s
+    puts @value
+  end
 end
 
 # test driven development before i learn test driven development
@@ -193,11 +201,11 @@ p my_list.find("espeon")
 puts ""
 
 puts "tests (head) expect 'espeon'"
-p my_list.head
+my_list.head.to_s
 puts ""
 
 puts "tests (tail) expect 'sylveon'"
-p my_list.tail
+my_list.tail.to_s
 puts ""
 
 puts "tests (size, pop) expect 5, 4, 2"
@@ -210,21 +218,24 @@ p my_list.size
 puts ""
 
 puts "tests (to_s) expect ( espeon ) -> ( umbreon ) -> nil"
-p my_list.to_s
+my_list.to_s
 my_list.pop
-p my_list.to_s
+my_list.to_s
 my_list.append("umbreon")
 puts ""
 
 puts "tests (insert_at) expect ( espeon ) -> ( glaceon ) -> ( umbreon ) -> ( jolteon ) -> nil "
 my_list.insert_at("glaceon", 1)
 my_list.insert_at("jolteon", 3)
-p my_list.to_s
+my_list.to_s
 puts ""
 
 puts "tests (remove_at) expect ( glaceon ) -> ( jolteon ) -> nil "
 my_list.remove_at(0)
 my_list.remove_at(1)
-p my_list.to_s
+my_list.to_s
+puts ""
 
-p my_list.tail
+puts "tests (tail) expect jolteon"
+my_list.tail.to_s
+puts ""
