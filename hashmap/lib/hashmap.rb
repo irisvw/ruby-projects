@@ -3,7 +3,8 @@ require_relative 'linkedlist.rb'
 class HashMap
   def initialize
     @capacity = 16
-    @buckets = Array.new(@capacity, LinkedList.new())
+    @load_factor = 0.75
+    @buckets = Array.new(@capacity) {LinkedList.new()}
   end
 
   def hash(key)
@@ -14,14 +15,21 @@ class HashMap
   end
 
   def get_index(key)
-    index = hash(key) % 16
+    index = hash(key) % @capacity
     raise IndexError if index.negative? || index >= @buckets.length
     index
   end
 
   def set(key, value)
     index = get_index(key)
-    @buckets[index].append(key, value)
+    # check load factor
+    # rehash if necessary
+    if @buckets[index].contains?(key)
+      # find key
+      # override value
+    else
+      @buckets[index].append(key, value)
+    end
   end
 
   def get(key)
@@ -30,14 +38,13 @@ class HashMap
     return nil if @buckets[index].size == 0 || @buckets[index].contains?(key) == false
     
     key_index = @buckets[index].find(key)
-    value = @buckets.at(key_index)
-    value
+    @buckets[index].at(key_index)
   end
 
   def has?(key)
     index = get_index(key)
 
-    return @buckets[index].contains?(key) ? false : true
+    return @buckets[index].contains?(key)
   end
 
   def remove(key)
@@ -50,7 +57,8 @@ class HashMap
   end
 
   def length
-    return @buckets.compact.length
+    @buckets.select { |entry| entry.size != 0 }.length
+    # count how many nodes in each entry as well
   end
 
   def clear
@@ -58,17 +66,20 @@ class HashMap
   end
 
   def keys
-    array = @buckets.select { |entry| entry.size != 0 } 
+    array = @buckets.select { |entry| entry.size != 0 }
+    # get all stored keys
     array
   end
 
   def values
-    array = @buckets.select { |entry| entry.size != 0 } 
+    array = @buckets.select { |entry| entry.size != 0 }
+    # get all values from stored keys
     array
   end
 
   def entries
     array = @buckets.select { |entry| entry.size != 0 } 
+    # get each key value pair 
     array
   end
 end
@@ -126,15 +137,15 @@ puts "expect: ['Fred', 'George']"
 p map.keys
 puts ""
 
-puts "test: values"
-puts "expect: ['Smithy', 'Potter']"
-p map.values
-puts ""
+# puts "test: values"
+# puts "expect: ['Smithy', 'Potter']"
+# p map.values
+# puts ""
 
-puts "test: entries"
-puts "expect: [['Fred', 'Smithy'], ['George', 'Potter']]"
-p map.entries
-puts ""
+# puts "test: entries"
+# puts "expect: [['Fred', 'Smithy'], ['George', 'Potter']]"
+# p map.entries
+# puts ""
 
 puts "test: clear"
 puts "expect: 0"

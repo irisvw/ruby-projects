@@ -10,9 +10,6 @@ class LinkedList
       @head = Node.new(key, value)
     else
       tail.next_node = Node.new(key, value)
-      # current_node = @head
-      # current_node = current_node.next_node until current_node.next_node.nil?
-      # current_node.next_node = Node.new(key, value)
     end
   end
 
@@ -81,28 +78,28 @@ class LinkedList
     last_current_node.next_node = nil
   end
 
-  def contains?(value)
-    # returns true if the passed in value is in the list and otherwise returns false
+  def contains?(key)
+    # returns true if the passed in key is in the list and otherwise returns false
     return false if @head.nil?
 
     current_node = @head
-    while current_node.value != value
-      current_node = current_node.next_node
+    while current_node.key != key
       return false if current_node.next_node.nil?
+      current_node = current_node.next_node
     end
     return true
   end
 
-  def find(value)
+  def find(key)
     # returns the index of the node containing value, or nil if not found
     return nil if @head.nil?
 
     current_node = @head
     index = 0
-    while current_node.value != value
+    while current_node.key != key
+      return nil if current_node.key != key && current_node.next_node.nil?
       current_node = current_node.next_node
       index += 1
-      return nil if current_node.value != value && current_node.next_node.nil?
     end
     return index
   end
@@ -153,7 +150,7 @@ class LinkedList
 
     if index == 0
       @head = current_node.next_node
-      return current_node
+      return current_node.value
     else
       while index > 0
         previous_node = current_node
@@ -161,8 +158,29 @@ class LinkedList
         index -= 1
       end
       previous_node.next_node = current_node.next_node
+      return previous_node.value
     end
   end
+
+  def keys
+    return nil if @head.nil?
+
+    current_node = @head
+    output = [current_node]
+    loop do
+      if current_node.next_node.nil?
+        output << output # THIS IS WHERE YOU LEFT OFF
+        return
+      else
+        current_node = current_node.next_node
+        output << "( #{current_node.value} ) -> "
+      end
+    end
+    puts output
+  end
+  
+  def values
+  end 
 end
 
 class Node
