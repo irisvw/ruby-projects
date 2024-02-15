@@ -22,15 +22,6 @@ class HashMap
   def set(key, value)
     index = get_index(key)
     @buckets[index].append(key, value)
-    # if @buckets[index].head.nil?
-    #   @buckets[index].append(Node.new(key, value))
-    # # elsif @buckets[index].head.key == key
-    # #   @buckets[index].head.value = value
-    # else
-    #   current_node = @buckets[index].head
-    #   current_node = current_node.next_node until current_node.next_node == nil
-    #   current_node.append(Node.new(key, value))
-    # end
   end
 
   def get(key)
@@ -70,19 +61,13 @@ class HashMap
     array = @buckets.select { |entry| entry.size != 0 } 
     array
   end
-  # one entry is a linkedlist, sometimes empty, sometimes containing one, two, or more elements. compact won't work anymore cause they're not nil.
+
   def values
-    # array = []
-    # @buckets.each { |entry| array << entry.value } 
-    # array
     array = @buckets.select { |entry| entry.size != 0 } 
     array
   end
 
   def entries
-    # array = []
-    # @buckets.each { |entry| array << "[#{entry.key}, #{entry.value}]" } 
-    # array
     array = @buckets.select { |entry| entry.size != 0 } 
     array
   end
@@ -156,7 +141,3 @@ puts "expect: 0"
 map.clear
 p map.length
 puts ""
-
-# each bucket is a linked list?
-# if bucket is empty
-# bucket head = node
