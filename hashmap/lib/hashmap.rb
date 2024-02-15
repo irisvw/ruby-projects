@@ -1,51 +1,61 @@
-#raise IndexError if index.negative? || index >= @buckets.length
 require_relative 'linkedlist.rb'
 
 class HashMap
   def initialize
-    @buckets = Array.new
+    @capacity = 16
+    @buckets = Array.new(@capacity, LinkedList.new())
   end
 
   def hash(key)
     hash_code = 0
     prime_number = 31
-
     key.each_char { |char| hash_code = prime_number * hash_code + char.ord }
-
     hash_code
   end
 
-  def set(key, value)
+  def get_index(key)
     index = hash(key) % 16
-    if @buckets[index].nil?
-      @buckets[index] = Node.new(key, value)
-    elsif @buckets[index].key == key
-      @buckets[index].value = value
-    end
+    raise IndexError if index.negative? || index >= @buckets.length
+    index
+  end
+
+  def set(key, value)
+    index = get_index(key)
+    @buckets[index].append(key, value)
+    # if @buckets[index].head.nil?
+    #   @buckets[index].append(Node.new(key, value))
+    # # elsif @buckets[index].head.key == key
+    # #   @buckets[index].head.value = value
+    # else
+    #   current_node = @buckets[index].head
+    #   current_node = current_node.next_node until current_node.next_node == nil
+    #   current_node.append(Node.new(key, value))
+    # end
   end
 
   def get(key)
-    index = hash(key) % 16
-    return if @buckets[index].nil?
+    index = get_index(key)
+
+    return nil if @buckets[index].size == 0 || @buckets[index].contains?(key) == false
     
-    if @buckets[index].key == key
-      return @buckets[index].value
-    else
-      return nil
-    end
+    key_index = @buckets[index].find(key)
+    value = @buckets.at(key_index)
+    value
   end
 
   def has?(key)
-    index = hash(key) % 16
-    return @buckets[index].nil? ? false : true
+    index = get_index(key)
+
+    return @buckets[index].contains?(key) ? false : true
   end
 
   def remove(key)
-    index = hash(key) % 16
-    return nil if @buckets[index].nil?
-    value = @buckets[index].value
-    @buckets.delete_at(index)
-    value
+    index = get_index(key)
+
+    return nil if @buckets[index].size == 0 || @buckets[index].contains?(key) == false
+
+    key_index = @buckets[index].find(key)
+    @buckets[index].remove_at(key_index)
   end
 
   def length
@@ -57,20 +67,23 @@ class HashMap
   end
 
   def keys
-    array = []
-    @buckets.compact.each { |element| array << element.key } 
+    array = @buckets.select { |entry| entry.size != 0 } 
     array
   end
-
+  # one entry is a linkedlist, sometimes empty, sometimes containing one, two, or more elements. compact won't work anymore cause they're not nil.
   def values
-    array = []
-    @buckets.compact.each { |element| array << element.value } 
+    # array = []
+    # @buckets.each { |entry| array << entry.value } 
+    # array
+    array = @buckets.select { |entry| entry.size != 0 } 
     array
   end
 
   def entries
-    array = []
-    @buckets.compact.each { |element| array << "[#{element.key}, #{element.value}]" } 
+    # array = []
+    # @buckets.each { |entry| array << "[#{entry.key}, #{entry.value}]" } 
+    # array
+    array = @buckets.select { |entry| entry.size != 0 } 
     array
   end
 end
