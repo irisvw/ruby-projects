@@ -1,5 +1,3 @@
-require_relative 'linkedlist.rb'
-
 class HashMap
   def initialize
     @capacity = 16
@@ -22,14 +20,25 @@ class HashMap
 
   def set(key, value)
     index = get_index(key)
-    # check load factor
-    # rehash if necessary
+    capacity = length / @capacity
+    if capacity > @load_factor
+      grow
+    end
     if @buckets[index].contains?(key)
       # find key
       # override value
     else
       @buckets[index].append(key, value)
     end
+  end
+
+  def grow
+    # we create a new buckets list that is double the size of the old buckets list, 
+    # then we copy all nodes over to the new buckets.
+    @capacity *= 2
+    old_buckets = entries
+    clear
+    old_buckets.each { |entry| set(entry[0], entry[1])}
   end
 
   def get(key)
@@ -57,98 +66,33 @@ class HashMap
   end
 
   def length
-    @buckets.select { |entry| entry.size != 0 }.length
-    # count how many nodes in each entry as well
+    # returns the number of stored keys in the hash map.
+    entries.length
   end
 
   def clear
-    @buckets.clear
+    # removes all entries in the hash map.
+    @buckets = Array.new(@capacity) {LinkedList.new()}
   end
 
   def keys
-    array = @buckets.select { |entry| entry.size != 0 }
     # get all stored keys
-    array
+    array = entries
+    keys = array.map { |entry| entry[0] }
+    keys
   end
 
   def values
-    array = @buckets.select { |entry| entry.size != 0 }
     # get all values from stored keys
-    array
+    array = entries
+    values = array.map { |entry| entry[1]}
+    values
   end
 
   def entries
+    # get each key value pair
     array = @buckets.select { |entry| entry.size != 0 } 
-    # get each key value pair 
-    array
+    pairs = array.map { |entry| entry.pairs}
+    pairs.flatten(1)
   end
 end
-
-# tests
-
-map = HashMap.new()
-map.set("George", "Potter")
-map.set("Fred", "Smith")
-
-puts "test: has?"
-puts "expect: true"
-p map.has?("Fred")
-puts ""
-
-puts "test: has?"
-puts "expect: false"
-p map.has?("Harry")
-puts ""
-
-puts "test: get"
-puts "expect: Smith"
-p map.get("Fred")
-puts ""
-
-puts "test: get"
-puts "expect: nil"
-p map.get("Harry")
-puts ""
-
-puts "test: set"
-puts "expect: Smithy"
-map.set("Fred", "Smithy")
-p map.get("Fred")
-puts ""
-
-puts "test: remove"
-puts "expect: Potter"
-p map.remove("George")
-puts ""
-
-puts "test: length"
-puts "expect: 1"
-p map.length
-puts ""
-
-puts "test: length"
-puts "expect: 2"
-map.set("George", "Potter")
-p map.length
-puts ""
-
-puts "test: keys"
-puts "expect: ['Fred', 'George']"
-p map.keys
-puts ""
-
-# puts "test: values"
-# puts "expect: ['Smithy', 'Potter']"
-# p map.values
-# puts ""
-
-# puts "test: entries"
-# puts "expect: [['Fred', 'Smithy'], ['George', 'Potter']]"
-# p map.entries
-# puts ""
-
-puts "test: clear"
-puts "expect: 0"
-map.clear
-p map.length
-puts ""

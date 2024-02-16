@@ -162,25 +162,57 @@ class LinkedList
     end
   end
 
-  def keys
+  def pairs
+    # returns all pairs in the list
     return nil if @head.nil?
 
     current_node = @head
-    output = [current_node]
+    output = Array.new
     loop do
       if current_node.next_node.nil?
-        output << output # THIS IS WHERE YOU LEFT OFF
-        return
+        output << Array.new([current_node.key, current_node.value])
+        return output
       else
+        output << Array.new([current_node.key, current_node.value])
         current_node = current_node.next_node
-        output << "( #{current_node.value} ) -> "
       end
     end
-    puts output
+  end
+
+  def keys
+    # returns all keys in the list
+    return nil if @head.nil?
+
+    current_node = @head
+    output = Array.new
+    loop do
+      if current_node.next_node.nil?
+        output << current_node.key
+        return output
+      else
+        output << current_node.key
+        current_node = current_node.next_node
+      end
+    end
   end
   
   def values
+    # returns all values in the list
+    return nil if @head.nil?
+
+    current_node = @head
+    output = Array.new
+    loop do
+      if current_node.next_node.nil?
+        output << current_node.value
+        return output
+      else
+        output << current_node.value
+        current_node = current_node.next_node
+      end
+    end
   end 
+
 end
 
 class Node
@@ -194,6 +226,6 @@ class Node
   end
 
   def to_s
-    puts "#{key}: #{@value}"
+    puts "#{@key}: #{@value}"
   end
 end
