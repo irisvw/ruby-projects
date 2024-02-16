@@ -21,20 +21,20 @@ class HashMap
   def set(key, value)
     index = get_index(key)
     capacity = length / @capacity
+
     if capacity > @load_factor
       grow
     end
+
     if @buckets[index].contains?(key)
-      # find key
-      # override value
+      key_index = @buckets[index].find(key)
+      @buckets[index].update(key_index, value)
     else
       @buckets[index].append(key, value)
     end
   end
 
   def grow
-    # we create a new buckets list that is double the size of the old buckets list, 
-    # then we copy all nodes over to the new buckets.
     @capacity *= 2
     old_buckets = entries
     clear
@@ -47,7 +47,7 @@ class HashMap
     return nil if @buckets[index].size == 0 || @buckets[index].contains?(key) == false
     
     key_index = @buckets[index].find(key)
-    @buckets[index].at(key_index)
+    @buckets[index].at(key_index).value
   end
 
   def has?(key)
@@ -66,31 +66,26 @@ class HashMap
   end
 
   def length
-    # returns the number of stored keys in the hash map.
     entries.length
   end
 
   def clear
-    # removes all entries in the hash map.
     @buckets = Array.new(@capacity) {LinkedList.new()}
   end
 
   def keys
-    # get all stored keys
     array = entries
     keys = array.map { |entry| entry[0] }
     keys
   end
 
   def values
-    # get all values from stored keys
     array = entries
     values = array.map { |entry| entry[1]}
     values
   end
 
   def entries
-    # get each key value pair
     array = @buckets.select { |entry| entry.size != 0 } 
     pairs = array.map { |entry| entry.pairs}
     pairs.flatten(1)

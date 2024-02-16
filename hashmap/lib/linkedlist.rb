@@ -24,6 +24,12 @@ class LinkedList
     end
   end
 
+  def update(index, value)
+    # updates value of node at given index
+    node = at(index)
+    node.value = value
+  end
+
   def size
     # returns the total number of nodes in the list
     return 0 if @head.nil?
@@ -63,7 +69,7 @@ class LinkedList
       index -= 1
       return nil if current_node.next_node.nil?
     end
-    return current_node.value
+    return current_node
   end
 
   def pop
