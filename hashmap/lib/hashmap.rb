@@ -35,6 +35,7 @@ class HashMap
   end
 
   def grow
+    # doubles capacity of buckets, copies all nodes over
     @capacity *= 2
     old_buckets = entries
     clear
@@ -42,6 +43,7 @@ class HashMap
   end
 
   def get(key)
+    # returns the value that is assigned to the given key
     index = get_index(key)
 
     return nil if @buckets[index].size == 0 || @buckets[index].contains?(key) == false
@@ -51,12 +53,14 @@ class HashMap
   end
 
   def has?(key)
+    # returns true or false based on whether or not the given key is in the hash map.
     index = get_index(key)
 
     return @buckets[index].contains?(key)
   end
 
   def remove(key)
+    # removes the entry with the given key and return the deleted entry’s value.
     index = get_index(key)
 
     return nil if @buckets[index].size == 0 || @buckets[index].contains?(key) == false
@@ -66,26 +70,31 @@ class HashMap
   end
 
   def length
+    # returns the number of stored keys in the hash map.
     entries.length
   end
 
   def clear
+    # removes all entries in the hash map.
     @buckets = Array.new(@capacity) {LinkedList.new()}
   end
 
   def keys
+    # returns an array containing all the keys inside the hash map.
     array = entries
     keys = array.map { |entry| entry[0] }
     keys
   end
 
   def values
+    # returns an array containing all the values.
     array = entries
     values = array.map { |entry| entry[1]}
     values
   end
 
   def entries
+    # returns an array that contains each key, value pair.
     array = @buckets.select { |entry| entry.size != 0 } 
     pairs = array.map { |entry| entry.pairs}
     pairs.flatten(1)
