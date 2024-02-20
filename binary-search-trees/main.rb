@@ -20,3 +20,6 @@ my_tree.pretty_print
 
 my_tree.delete(8)
 my_tree.pretty_print
+
+p my_tree.find(7)
+p my_tree.find(67)

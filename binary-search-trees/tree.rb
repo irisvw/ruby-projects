@@ -104,6 +104,25 @@ class Tree
     end
   end
 
+  def find(value, root = @root)
+    # returns the node with the given value
+
+    # start at root
+    # is given value equal to root? return root.
+    # is given value greater than root? find(root.right)
+    # else? find(root.left)
+    return nil if root.nil?
+    # base case
+    if root.data == value
+      return root
+    elsif root.data < value
+      root = find(value, root.right)
+    else
+      root = find(value, root.left)
+    end
+    return root
+  end
+
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
