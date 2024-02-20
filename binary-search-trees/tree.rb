@@ -124,10 +124,14 @@ class Tree
   end
 
   def level_order(root = @root)
-    # breadth order
+    # breadth first
+    # visit root. store left and right in queue. execute block for root.
+    # visit nodes in queue in order. execute block, queue children, remove node.
     return if root.nil?
+
     queue = [root]
     output = []
+
     while queue.any?
       if block_given?
         yield(queue[0].data)
@@ -138,9 +142,50 @@ class Tree
       queue << queue[0].right unless queue[0].right.nil?
       queue.shift
     end
+
     return output unless output.empty?
-    # visit root. store left and right in queue. execute block for root.
-    # visit nodes in queue in order. execute block, queue children, remove node.
+  end
+
+  def inorder(root = @root, output = [])
+    return if root.nil?
+
+    inorder(root.left, output)
+    if block_given?
+      yield(root.data)
+    else
+      output << root.data
+    end
+    inorder(root.right, output)
+    return output
+  end
+
+  def preorder(root = @root, output = [])
+    return if root.nil?
+
+    if block_given?
+      yield(root.data)
+    else
+      output << root.data
+    end
+    preorder(root.left, output)
+    preorder(root.right, output)
+    return output
+    # visit root
+    # visit left subtree
+    # visit right subtree
+  end
+
+  def postorder(root = @root, output = [])
+    return if root.nil?
+
+    postorder(root.left, output)
+    postorder(root.right, output)
+    if block_given?
+      yield(root.data)
+    else
+      output << root.data
+    end
+    return output
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
