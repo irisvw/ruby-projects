@@ -23,3 +23,6 @@ my_tree.pretty_print
 
 p my_tree.find(7)
 p my_tree.find(67)
+
+p my_tree.level_order
+p my_tree.level_order { |element| p element * 2}

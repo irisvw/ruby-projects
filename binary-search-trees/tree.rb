@@ -123,6 +123,26 @@ class Tree
     return root
   end
 
+  def level_order(root = @root)
+    # breadth order
+    return if root.nil?
+    queue = [root]
+    output = []
+    while queue.any?
+      if block_given?
+        yield(queue[0].data)
+      else
+        output << queue[0].data
+      end
+      queue << queue[0].left unless queue[0].left.nil?
+      queue << queue[0].right unless queue[0].right.nil?
+      queue.shift
+    end
+    return output unless output.empty?
+    # visit root. store left and right in queue. execute block for root.
+    # visit nodes in queue in order. execute block, queue children, remove node.
+  end
+
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
