@@ -7,34 +7,18 @@ class Tree
   end
 
   def build_tree(array = @array, start = 0, finish = @array.length - 1)
-    # base case
     return nil if start > finish
 
-    # calculate mid point
     mid = (start + finish) / 2
-
-    # set middle element as root
     root = Node.new(array[mid])
-
-    # calculate mid of left_array, assign to left
     root.left = build_tree(array, start, mid-1)
-
-    # calculate mid of right_array, assign to right
     root.right = build_tree(array, mid+1, finish)
-
-    # return root as node
     return root
   end
 
   def insert(value, root = @root)
-    # accepts value to insert
-    # always as a leaf
-    # search for the parent key from the root
-
-    # base case
     return Node.new(value) if root.nil?
 
-    # return existing value if value already exists
     if root.data == value
       return root
     elsif root.data < value
@@ -44,21 +28,12 @@ class Tree
     end
 
     return root
-    # currentnode.data == value ? return nil.
-    # currentnode.data < value ? currentnode = currentnode.right
-    # currentnode.data > value ? currentnode = currentnode.left
-    # if node.left.nil? && node.right.nil?
-    # if value > currentnode.data, currentnode.right = value
-    # else currentnode.left = value
   end
 
   def delete(value, root = @root)
-    # accepts value to delete
-    # recursively traverse the tree?
-
-    # base case
     return root if root.nil?
 
+    # recursion
     if root.data < value
       root.right = delete(value, root.right)
       return root
@@ -67,9 +42,7 @@ class Tree
       return root
     end
 
-    # case 2: node with 1 kid
-    # replace node with its child
-
+    # if node has zero or one child
     if root.left.nil?
       root = root.right 
       return root
@@ -77,21 +50,14 @@ class Tree
       root = root.left
       return root
     else
-      # case 3: node with 2 kids
-      # find the smallest value in its right subtree
-      
+      # if node has two children
       parent_root = root
       next_root = root.right
-
-      # next_root = next_root.left until next_root.left.nil?
       while next_root.left != nil
         parent_root = next_root
         next_root = next_root.left
       end
 
-      # if next_root has no kids, replace root with next_root and get rid of next_root.
-      # if next_root has a kid, it's always a kid with a larger value than itself.
-      # append kid to next_root's parent on the left side. 
       root.data = next_root.data
 
       if parent_root != root
@@ -105,14 +71,8 @@ class Tree
   end
 
   def find(value, root = @root)
-    # returns the node with the given value
-
-    # start at root
-    # is given value equal to root? return root.
-    # is given value greater than root? find(root.right)
-    # else? find(root.left)
     return nil if root.nil?
-    # base case
+
     if root.data == value
       return root
     elsif root.data < value
@@ -124,9 +84,6 @@ class Tree
   end
 
   def level_order(root = @root)
-    # breadth first
-    # visit root. store left and right in queue. execute block for root.
-    # visit nodes in queue in order. execute block, queue children, remove node.
     return if root.nil?
 
     queue = [root]
@@ -170,9 +127,6 @@ class Tree
     preorder(root.left, output)
     preorder(root.right, output)
     return output
-    # visit root
-    # visit left subtree
-    # visit right subtree
   end
 
   def postorder(root = @root, output = [])
@@ -189,10 +143,6 @@ class Tree
   end
 
   def height(node = @root)
-    # accepts a node and returns its height
-    # the number of edges in longest path from a given node to a leaf node.
-
-    # traverse both left and right subtree. check which is longest.
     return -1 if node.nil?
 
     left = height(node.left)
@@ -202,9 +152,6 @@ class Tree
   end
 
   def depth(node, root = @root)
-    # accepts a node and returns its depth
-    # the number of edges in path from a given node to the tree’s root node.
-    
     return -1 if root.nil?
     return 0 if root.data == node
 
@@ -220,22 +167,9 @@ class Tree
     return true if node.nil?
 
     diff = (height(node.left) - height(node.right)).abs
-    # return false if diff > 1
-    # balanced?(left.left, left.right) unless height(left).zero?
-    # balanced?(right.left, right.right) unless height(right).zero?
-
     return true if diff <= 1 && balanced?(node.left) && balanced?(node.right)
 
     return false
-    # check the difference between height of right and height of left
-    # false? return false
-    # true? check if height of right.right == right.left.
-    # stop when right.right and right.left are both null (reached leaf?)
-
-    # some cases.
-    # node doesn't have kids. left.left and left.right will be nil. height is 0.
-    # node has a kid. either left.left or left.right will be nil. height is 1+.
-    # node has two kids. both left.left and left.right have a value. height is 1+.
   end
 
   def rebalance
@@ -243,6 +177,7 @@ class Tree
     @root = build_tree()
   end
 
+  # method written by fensus on the TOP discord.
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
