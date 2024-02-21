@@ -40,3 +40,36 @@ puts ""
 puts "Test: postorder. Expect: [3, 1, 7, 4, 23, 324, 67, 9]"
 p my_tree.postorder
 puts ""
+
+puts "Test: height. Expect: 3"
+p my_tree.height
+puts ""
+
+puts "Test: depth. Expect: 1"
+p my_tree.depth(4)
+puts ""
+
+puts "Test: depth. Expect: 2"
+p my_tree.depth(7)
+puts ""
+
+puts "Test: depth. Expect: 3"
+p my_tree.depth(3)
+puts ""
+
+puts "Test: balanced? Expect: true"
+p my_tree.balanced?
+puts ""
+
+puts "Test: balanced? Expect: false"
+my_tree.insert(3141)
+my_tree.insert(5926)
+p my_tree.balanced?
+puts ""
+
+p my_tree.pretty_print
+
+my_tree.rebalance
+
+my_tree.pretty_print
+p my_tree.find(5926)

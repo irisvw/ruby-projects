@@ -188,6 +188,61 @@ class Tree
     return output
   end
 
+  def height(node = @root)
+    # accepts a node and returns its height
+    # the number of edges in longest path from a given node to a leaf node.
+
+    # traverse both left and right subtree. check which is longest.
+    return -1 if node.nil?
+
+    left = height(node.left)
+    right = height(node.right)
+
+    return left > right ? left + 1 : right + 1 
+  end
+
+  def depth(node, root = @root)
+    # accepts a node and returns its depth
+    # the number of edges in path from a given node to the tree’s root node.
+    
+    return -1 if root.nil?
+    return 0 if root.data == node
+
+    left = depth(node, root.left)
+    return left + 1 if left >= 0
+    right = depth(node, root.right)
+    return right + 1 if right >= 0
+
+    return -1
+  end
+
+  def balanced?(node = @root)
+    return true if node.nil?
+
+    diff = (height(node.left) - height(node.right)).abs
+    # return false if diff > 1
+    # balanced?(left.left, left.right) unless height(left).zero?
+    # balanced?(right.left, right.right) unless height(right).zero?
+
+    return true if diff <= 1 && balanced?(node.left) && balanced?(node.right)
+
+    return false
+    # check the difference between height of right and height of left
+    # false? return false
+    # true? check if height of right.right == right.left.
+    # stop when right.right and right.left are both null (reached leaf?)
+
+    # some cases.
+    # node doesn't have kids. left.left and left.right will be nil. height is 0.
+    # node has a kid. either left.left or left.right will be nil. height is 1+.
+    # node has two kids. both left.left and left.right have a value. height is 1+.
+  end
+
+  def rebalance
+    @array = inorder
+    @root = build_tree()
+  end
+
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
