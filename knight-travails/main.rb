@@ -88,11 +88,16 @@ class Graph
   end
 
   def knight_moves(start, finish)
-    # shows the shortest possible way to get from one square to another 
-    # by outputting all squares the knight will stop on along the way.
+    path = bfs(start, finish) 
+    short_path = path.map { |node| "[#{node.x}, #{node.y}]" }.reverse!
+    puts "You made it in #{path.length} move(s)! Here's your path:"
+    short_path.each { |step| puts step }
+    puts ""
   end
 
   def bfs(root, goal)
+    @nodes.each { |node| node.parent = nil}
+
     root_node = @nodes.find { |element| element.x == root[0] && element.y == root[1]}
     goal_node = @nodes.find { |element| element.x == goal[0] && element.y == goal[1]}
     queue = [root_node]
@@ -103,16 +108,8 @@ class Graph
         neighbor.parent = queue[0]
         queue << neighbor
       end
-      # output << [queue[0].x, queue[0].y] # store x and y of root
-      # store x and y of every neighbor
-      # parent = queue[0]
-      # neighbors = parent.neighbors
-      # neighbors.each { |neighbor| queue << neighbor if neighbor.parent.nil?}
       queue.shift
-      # queue.each { |neighbor| neighbor.parent = parent }
-      # queue << queue[0].left unless queue[0].left.nil?
-      # queue << queue[0].right unless queue[0].right.nil?
-      # queue.shift
+
       if queue.include?(goal_node)
         current = goal_node
         path = [current]
@@ -121,17 +118,15 @@ class Graph
           path << current
           break if current == root_node
         end
+        
         return path
       end
     end
     return false
-    # return output unless output.empty?
-    # enqueue root.
-    # queue all its neighbors (with root as parent?). check if any neighbors are the goal node.
-    # true? return root coords, goal coords.
-    # false? queue all the neighbor's neighbors (with the previous neighbor as the parent?). check if any neighbors are the goal node.
   end
+
 end
 
 board = Graph.new()
-p board.bfs([0,0], [3,3])
+board.knight_moves([0,0], [3,3])
+board.knight_moves([0,0], [7,7])
