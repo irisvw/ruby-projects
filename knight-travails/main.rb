@@ -34,7 +34,7 @@
 # [x+2, y-1]
 
 class Node
-  attr_accessor :x, :y, :neighbors
+  attr_accessor :x, :y, :neighbors, :parent
   def initialize(x, y)
     @x = x
     @y = y
@@ -79,11 +79,11 @@ class Graph
 
   def generate_neighbors(array)
     array.each do |node|
-    x = node.x
-    y = node.y
-    moves = [[x-2, y+1], [x-2, y-1], [x-1, y+2], [x-1, y-2], [x+1, y+2], [x+1, y-2], [x+2, y+1], [x+2, y-1]]
-    moves.keep_if { |move| move[0].between?(0, 7) && move[1].between?(0,7)}
-    node.neighbors = moves.map { |move| @nodes.select { |element| element.x == move[0] && element.y == move[1]}}
+      x = node.x
+      y = node.y
+      moves = [[x-2, y+1], [x-2, y-1], [x-1, y+2], [x-1, y-2], [x+1, y+2], [x+1, y-2], [x+2, y+1], [x+2, y-1]]
+      moves.keep_if { |move| move[0].between?(0, 7) && move[1].between?(0,7)}
+      node.neighbors = moves.map { |move| @nodes.find { |element| element.x == move[0] && element.y == move[1]}}
     end
   end
 
@@ -93,22 +93,36 @@ class Graph
   end
 
   def bfs(root, goal)
-    root_node = @nodes.select { |element| element.x == root[0] && element.y == root[1]}
-    goal_node = @nodes.select { |element| element.x == goal[0] && element.y == goal[1]}
+    root_node = @nodes.find { |element| element.x == root[0] && element.y == root[1]}
+    goal_node = @nodes.find { |element| element.x == goal[0] && element.y == goal[1]}
     queue = [root_node]
 
     while queue.any?
+      queue[0].neighbors.each do |neighbor|
+        next unless neighbor.parent.nil?
+        neighbor.parent = queue[0]
+        queue << neighbor
+      end
       # output << [queue[0].x, queue[0].y] # store x and y of root
       # store x and y of every neighbor
-      parent = queue[0]
-      neighbors = parent.neighbors
+      # parent = queue[0]
+      # neighbors = parent.neighbors
       # neighbors.each { |neighbor| queue << neighbor if neighbor.parent.nil?}
       queue.shift
-      queue.each { |neighbor| neighbor.parent = parent }
+      # queue.each { |neighbor| neighbor.parent = parent }
       # queue << queue[0].left unless queue[0].left.nil?
       # queue << queue[0].right unless queue[0].right.nil?
       # queue.shift
-      return true if queue.include?(goal_node)
+      if queue.include?(goal_node)
+        current = goal_node
+        path = [current]
+        loop do
+          current = current.parent
+          path << current
+          break if current == root_node
+        end
+        return path
+      end
     end
     return false
     # return output unless output.empty?
