@@ -1,38 +1,3 @@
-# For every square there is a number of possible moves, 
-# choose a data structure that will allow you to work with them. 
-# Don’t allow any moves to go off the board.
-
-# We're gonna want to use a graph. Every square on the board is a node.
-# Every possible move is an edge between two squares on the board. 
-
-# How do we make this graph?
-# it would be an unweighted, undirected, cyclic graph. 8*8.
-# each node holds its coordinates [0,0] to [7,7]
-# each node also holds its neighbors. 
-
-# How do we find the shortest path?
-# https://www.geeksforgeeks.org/shortest-path-unweighted-graph/
-# steal an existing algorithm!
-
-# What's the shortest path between two nodes in this undirected, unweighted graph? 
-# Run BFS from one node and backtrack once you reach the second. 
-# Note: BFS always finds the shortest path, assuming the graph is undirected and unweighted. 
-# DFS does not always find the shortest path.
-
-# Moves!
-# For each node;
-# Generate neighbors.
-# Disregard neighbors if either their x or y coordinate is not between 0 and 7.
-# The possible moves are:
-# [x-2, y+1]
-# [x-2, y-1]
-# [x-1, y+2]
-# [x-1, y-2]
-# [x+1, y+2]
-# [x+1, y-2]
-# [x+2, y+1]
-# [x+2, y-1]
-
 class Node
   attr_accessor :x, :y, :neighbors, :parent
   def initialize(x, y)
@@ -41,22 +6,6 @@ class Node
     @neighbors = []
     @parent = nil
   end
-
-  # def neighbors(x = @x, y = @y)
-  #   moves = [[x-2, y+1], [x-2, y-1], [x-1, y+2], [x-1, y-2], [x+1, y+2], [x+1, y-2], [x+2, y+1], [x+2, y-1]]
-  #   moves.keep_if { |move| move[0].between?(0, 7) && move[1].between?(0,7)}
-  #   # for each array in this array,
-  #   # substitute x and y for @x and @y, and add the result to array neighbors.
-
-  #   # remove all values from array that are not between 0 and 7.
-  #   # check each array in array.
-  #   # remove if either array[0] or array[1] are not in range 0..7
-
-  #   # actually translate the neighbors to fellow nodes.
-
-  #   # [0,0] -> [[1, 2], [2, 1]]
-  #   moves.map { |move| nodes.select { |node| node.x == move[0] && node.y == move[1]}}
-  # end
 end
 
 class Graph
