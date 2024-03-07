@@ -71,7 +71,6 @@ class Graph
         return path
       end
     end
-    return false
   end
 
 end
