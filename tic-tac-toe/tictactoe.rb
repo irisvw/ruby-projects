@@ -13,8 +13,6 @@ class Cell
   end
 end
 
-###
-
 class Board
   attr_reader :cells
 
@@ -38,26 +36,24 @@ class Board
   end
 
   def play
+    display_board
     loop do
-      # get user input
       cell = ask_input
-      # if user input valid
-      # place mark in box
       cell.value = @current_player.mark
       display_board
-      # check if victory
+
       if victory?(cell.row, cell.col, @current_player.mark)
         puts "#{@current_player.name} is the winner!"
         break
       end
-      # check if tie
+
       if is_full?
         puts "It's a tie."
         break
       end
       switch_player
-      # display board
     end
+    new_game
   end
 
   def switch_player
@@ -136,103 +132,26 @@ class Board
   def find_cell(row, col)
     @cells.find { |cell| cell.row == row && cell.col == col}
   end
-end
 
-###
+  def new_game
+    puts "Would you like to start a new game? (y/n)"
+    input = gets.chomp.downcase
+    if input == "y"
+      clear
+      @current_player = @player1
+      play
+    end
+  end
+end
 
 class Player
   attr_reader :mark, :name
-  attr_accessor :current
-
-  def initialize(mark, current = false, name)
+  
+  def initialize(mark, name)
     @mark = mark
-    @current = current
     @name = name
   end
-
-  # def ask_input
-  #   puts "#{current_player}, where would you like to place your mark?"
-  #   loop do
-  #     user_input = gets.chomp.downcase
-  #     input_col = user_input.chars[0]
-  #     input_row = user_input.chars[1].to_i
-  #     input_cell = cell_array.find { |cell| cell.row == input_row && cell.col == input_col }
-  #     break if input_cell.is_empty?
-  # end
 end
 
-# current_player = "Player 1"
 board = Board.new
 board.play
-
-# while (game)
-#     puts "#{current_player}, where would you like to place your mark?"
-#     user_input = gets.chomp.downcase
-
-#     if ["a1", "a2", "a3", "b1", "b2", "b3", "c1", "c2", "c3"].include?(user_input)
-#         input_col = user_input.chars[0]
-#         input_row = user_input.chars[1].to_i
-#         input_cell = cell_array.find { |cell| cell.row == input_row && cell.col == input_col }
-
-#         if (input_cell.is_empty?)
-#             if (current_player == "Player 1")
-#                 input_cell.value = "x"
-#                 if (board.victory?(input_row, input_col, "x"))
-#                     puts "#{current_player} is the winner! Would you like to start a new game? y/n"
-#                     yn_input = gets.chomp.downcase
-#                     game = false;
-#                 elsif (board.is_full?)
-#                     puts "It's a tie. Would you like to start a new game? y/n"
-#                     yn_input = gets.chomp.downcase
-#                     game = false;
-#                 end
-#                 current_player = "Player 2"
-
-#             elsif (current_player == "Player 2")
-#                 input_cell.value = "o"
-#                 if (board.victory?(input_row, input_col, "o"))
-#                     puts "#{current_player} is the winner! Would you like to start a new game? y/n"
-#                     yn_input = gets.chomp.downcase
-#                     game = false;
-#                 elsif (board.is_full?)
-#                     puts "It's a tie. Would you like to start a new game? y/n"
-#                     yn_input = gets.chomp.downcase
-#                     game = false;
-#                 end
-#                 current_player = "Player 1"
-#             end
-#         else
-#             puts "That space is already taken."
-#         end
-#     else
-#         puts "Please specify your input as column-row, eg 'a1' or 'c2'."
-#     end
-
-#     puts "
-#         | a | b | c |
-#      ---+---+---+---+
-#       3 | #{a3.value} | #{b3.value} | #{c3.value} |
-#      ---+---+---+---+
-#       2 | #{a2.value} | #{b2.value} | #{c2.value} |
-#      ---+---+---+---+
-#       1 | #{a1.value} | #{b1.value} | #{c1.value} |
-#      ---+---+---+---+"
-
-#      while (!game && (yn_input != "y" || yn_input != "n"))
-#         if (yn_input == "y")
-#             board.clear()
-#             current_player = "Player 1"
-#             yn_input = ""
-#             game = true
-#             break
-#         elsif (yn_input == "n")
-#             board.clear()
-#             game = false
-#             yn_input = ""
-#             break
-#         else
-#             puts "Invalid input. Please reply with 'y' or 'n'."
-#             yn_input = gets.chomp.downcase
-#         end
-#     end
-# end
