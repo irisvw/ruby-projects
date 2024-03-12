@@ -3,6 +3,9 @@ class Game
 
   def initialize
     @board = create_board
+    @player1 = Player.new("Player 1", "x")
+    @player2 = Player.new("Player 2", "o")
+    @current_player = @player1
   end
 
   # create 7 by 6 grid
@@ -17,6 +20,14 @@ class Game
   end
 
   def play
+    loop do
+      display_board
+      cell = place_token
+      mark_space(cell)
+      victory?(cell)
+      draw?
+      switch_player
+    end
     # display board
     # ask player for input
     # verify input (int between 0 and 6)
@@ -29,7 +40,12 @@ class Game
     # ask player for input
   end
 
+  def switch_player
+    @current_player = @current_player == @player1 ? @player2 : @player1
+  end
+
   def player_input
+    puts "In which column would you like to drop your token?"
     loop do
       input = gets.chomp.to_i 
       return input if input.between?(0, 6)
@@ -37,49 +53,78 @@ class Game
     end
   end
 
+  # get player input and return first empty cell in a given column
   def place_token
     loop do
-      # get player input
       input = player_input
-      # check if column is empty
       cell = col_free(input)
-      # return first empty cell
       return cell unless cell.nil?
       puts "That column is full."
     end
   end
 
-  def diagonals(row, col)
-    # diag1 = [x-3, y-3], [x-2, y-2], [x-1, y-1], [x, y], [x+1, y+1], [x+2, y+2], [x+3, y+3]
-    # diag2 = [x-3, y+3], [x-2, y+2], [x-1, y+1], [x, y], [x+1, y-1], [x+2, y-2], [x+3, y-3]
+  def mark_space(cell)
+    cell.value = @current_player.token
+  end
+
+  def diagonal1(cell)
+    x = cell.col
+    y = cell.row
+    diag = [[x-3, y-3], [x-2, y-2], [x-1, y-1], [x, y], [x+1, y+1], [x+2, y+2], [x+3, y+3]]
+    diag.keep_if { |c| c[0].between?(0, 7) && c[1].between?(0,6)}
+    return nil if diag.length < 4
+    diag.map! { |c| find_cell(c[0], c[1])}
     # keep cell if valid cell
   end
 
+  def diagonal2(cell)
+    x = cell.col
+    y = cell.row
+    diag = [[x-3, y+3], [x-2, y+2], [x-1, y+1], [x, y], [x+1, y-1], [x+2, y-2], [x+3, y-3]]
+    diag.keep_if { |c| c[0].between?(0, 7) && c[1].between?(0,6)}
+    return nil if diag.length < 4
+    diag.map! { |c| find_cell(c[0], c[1])}
+  end
+
   # get entire row
-  def row_cells(i)
-    @board.select { |cell| cell.row == i }
+  def row_cells(cell_row)
+    line = @board.select { |c| c.row == cell_row }
+    line.sort_by! { |c| c.col }
   end
 
   # get entire column
-  def col_cells(i)
-    @board.select { |cell| cell.col == i }
+  def col_cells(cell_col)
+    line = @board.select { |c| c.col == cell_col }
+    line.sort_by! { |c| c.row }
   end
 
+  # check line for four in a row
   def find_four?(line)
-    # check line for four in a row
+    return false if line.nil?
+
+    line.map! { |c| c.value }
+    four = "#{@current_player.token}" * 4
+    line.join.include?(four)
   end
 
-  def victory?
-    find_four?(row_cells(i))
-    find_four?(col_cells(i))
-    find_four?(diagonals(i))
+  def victory?(cell)
+    cell_row = cell.row
+    cell_col = cell.col
+
+    return (find_four?(row_cells(cell_row)) ||
+            find_four?(col_cells(cell_col)) ||
+            find_four?(diagonals(cell)))
   end
 
+  # returns lowest free spot or nil if none found
   def col_free(i)
-    # returns lowest free spot or nil if none found
     col = col_cells(i)
-    col.sort_by! { |cell| cell.row }
-    col
+    col.find { |c| c.free? }
+  end
+
+  # find a single cell by its row and col. testing purposes only
+  def find_cell(row, col)
+    @board.find { |c| c.row == row && c.col == col}
   end
 
   def display_board

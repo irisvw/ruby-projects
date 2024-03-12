@@ -43,7 +43,8 @@ describe Game do
       end
 
       it 'does not display an error message when input is valid' do
-        expect(game).not_to receive(:puts)
+        error_message = "Please enter a value between 0 and 6."
+        expect(game).not_to receive(:puts).with(error_message)
         game.player_input
       end
 
@@ -58,7 +59,9 @@ describe Game do
       end
 
       it 'puts an error message once if input is invalid' do
+        message = "In which column would you like to drop your token?"
         error_message = "Please enter a value between 0 and 6."
+        allow(game).to receive(:puts).with(message).once
         expect(game).to receive(:puts).with(error_message).once
         game.player_input
       end
@@ -77,11 +80,49 @@ describe Game do
     end
   end
 
-  describe '#find_four' do
-    xit 'returns false when there are no four consecutive identical marks' do
+  describe '#diagonal' do
+    context 'when the diagonal is too short' do
+      it 'returns nil' do
+      end
+    end
+
+    context 'when the diagonal is long enough' do
+      it 'returns a line of seven cells' do
+      end
+  end
+
+  describe '#find_four?' do
+    context 'when there are no four consecutive identical marks' do
+      before do
+        row = game.row_cells(1)
+        row.each { |c| c.value = "o" }
+        #game.set_instance_variable(:current_player)
+      end
+
+      let(:current_player) { player1 }
+
+      it 'returns false ' do
+        row = game.row_cells(1)
+        expect(game.find_four?(row)).to be false
+      end
     end
     
-    xit 'returns true when there are four consecutive identical marks' do
+    context 'when there are four consecutive identical marks' do
+      before do
+        row = game.row_cells(1)
+        row.each { |c| c.value = "x" }
+      end
+
+      let(:current_player) { player1 }
+      it 'returns true ' do
+        row = game.row_cells(1)
+        expect(game.find_four?(row)).to be true
+      end
+
+      it 'returns false when not all marks match' do
+        column = game.col_cells(0)
+        expect(game.find_four?(column)).to be false
+      end
     end
   end
 
@@ -103,7 +144,7 @@ describe Game do
 
     context 'when the selected column is full' do
       before do
-        column = game.col(1)
+        column = game.col_cells(1)
         column.each { |cell| cell.value = "x" }
       end
 
@@ -113,14 +154,23 @@ describe Game do
     end
 
     context 'when the selected column has two cells filled' do
-      xit 'returns the lowest free cell in the column' do
-        expect(game.col_free(1)).to be
+      before do
+        cell1 = game.find_cell(0, 1)
+        cell2 = game.find_cell(1, 1)
+        cell1.value = "x"
+        cell2.value = "x"
+      end
+
+      it 'returns the lowest free cell in the column' do
+        cell = game.find_cell(2,1)
+        expect(game.col_free(1)).to be(cell)
       end
     end
 
     context 'when the selected column is empty' do
-      xit 'returns the lowest cell in the column' do
-        expect(game.col_free(1)).to be
+      it 'returns the lowest cell in the column' do
+        cell = game.find_cell(0,1)
+        expect(game.col_free(1)).to be(cell)
       end
     end
   end
