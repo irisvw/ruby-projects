@@ -6,7 +6,7 @@ describe Game do
   subject(:game) { described_class.new }
 
   describe '#create_board' do
-    it 'creates a board containing of 42 cells' do
+    it 'creates a board containing 42 cells' do
       expect(game.board.length).to eq(42)
     end
 
@@ -59,7 +59,7 @@ describe Game do
       end
 
       it 'puts an error message once if input is invalid' do
-        message = "In which column would you like to drop your token?"
+        message = "Player 1, in which column would you like to drop your token?"
         error_message = "Please enter a value between 0 and 6."
         allow(game).to receive(:puts).with(message).once
         expect(game).to receive(:puts).with(error_message).once
@@ -83,12 +83,24 @@ describe Game do
   describe '#diagonal' do
     context 'when the diagonal is too short' do
       it 'returns nil' do
+        cell = game.find_cell(1, 1)
+        expect(game.diagonal(cell, "main")).to be nil
       end
     end
 
-    context 'when the diagonal is long enough' do
-      it 'returns a line of seven cells' do
+    context 'when the diagonal is a maximum of five' do
+      it 'returns a line of five cells' do
+        cell = game.find_cell(2, 2)
+        expect(game.diagonal(cell, "main").length).to eq(5)
       end
+    end
+
+    context 'when the diagonal is a maximum of six' do
+      it 'returns a line of six cells' do
+        cell = game.find_cell(2, 3)
+        expect(game.diagonal(cell, "main").length).to eq(6)
+      end
+    end
   end
 
   describe '#find_four?' do
@@ -96,7 +108,6 @@ describe Game do
       before do
         row = game.row_cells(1)
         row.each { |c| c.value = "o" }
-        #game.set_instance_variable(:current_player)
       end
 
       let(:current_player) { player1 }
@@ -124,24 +135,96 @@ describe Game do
         expect(game.find_four?(column)).to be false
       end
     end
+
+    context 'when there are four consecutive identical marks on the diagonal' do
+      before do
+        cells = [[0,0], [1,1], [2,2], [3,3]]
+        cells.map! { |c| game.find_cell(c[0], c[1])}
+        cells.each { |c| c.value = "x" }
+      end
+
+      let(:current_player) { player1 }
+      it 'returns true ' do
+        cell = game.find_cell(0, 0)
+        diag = game.diagonal(cell, "counter")
+        expect(game.find_four?(diag)).to be true
+      end
+    end
   end
 
   describe '#victory?' do
-    xit 'returns false when four in a row is not found' do
+    it 'returns false when four in a row is not found' do
+      cell = game.find_cell(0,1)
+      expect(game.victory?(cell)).to be false
     end
 
-    xit 'returns true when four in a row is found on a row' do
+    context 'when four in a row is found on a row' do
+      before do
+        cells = [[0,2], [0,3], [0,4], [0,5]]
+        cells.map! { |c| game.find_cell(c[0], c[1])}
+        cells.each { |c| c.value = "x" }
+      end
+
+      it 'returns true' do
+        cell = game.find_cell(0,3)
+        expect(game.victory?(cell)).to be true
+      end
+    end
+    
+    context 'when four in a row is found on a column' do
+      before do
+        cells = [[0,2], [1,2], [2,2], [3,2]]
+        cells.map! { |c| game.find_cell(c[0], c[1])}
+        cells.each { |c| c.value = "x" }
+      end
+
+      it 'returns true' do
+        cell = game.find_cell(0,2)
+        expect(game.victory?(cell)).to be true
+      end
     end
 
-    xit 'returns true when four in a row is found on a column' do
+    context 'when four in a row is found on a counter diagonal' do
+      before do
+        cells = [[0,0], [1,1], [2,2], [3,3]]
+        cells.map! { |c| game.find_cell(c[0], c[1])}
+        cells.each { |c| c.value = "x" }
+      end
+
+      it 'returns true' do
+        cell = game.find_cell(1,1)
+        expect(game.victory?(cell)).to be true
+      end
     end
 
-    xit 'returns true when four in a row is found on a diagonal' do
+    context 'when four in a row is found on a high main diagonal' do
+      before do
+        cells = [[0,5], [1,4], [2,3], [3,2]]
+        cells.map! { |c| game.find_cell(c[0], c[1])}
+        cells.each { |c| c.value = "x" }
+      end
+
+      it 'returns true' do
+        cell = game.find_cell(1,4)
+        expect(game.victory?(cell)).to be true
+      end
+    end
+
+    context 'when four in a row is found on a low main diagonal' do
+      before do
+        cells = [[0,3], [1,2], [2,1], [3,0]]
+        cells.map! { |c| game.find_cell(c[0], c[1])}
+        cells.each { |c| c.value = "x" }
+      end
+
+      it 'returns true' do
+        cell = game.find_cell(1,2)
+        expect(game.victory?(cell)).to be true
+      end
     end
   end
 
   describe '#col_free' do
-
     context 'when the selected column is full' do
       before do
         column = game.col_cells(1)
@@ -155,21 +238,21 @@ describe Game do
 
     context 'when the selected column has two cells filled' do
       before do
-        cell1 = game.find_cell(0, 1)
+        cell1 = game.find_cell(1, 0)
         cell2 = game.find_cell(1, 1)
         cell1.value = "x"
         cell2.value = "x"
       end
 
       it 'returns the lowest free cell in the column' do
-        cell = game.find_cell(2,1)
+        cell = game.find_cell(1, 2)
         expect(game.col_free(1)).to be(cell)
       end
     end
 
     context 'when the selected column is empty' do
       it 'returns the lowest cell in the column' do
-        cell = game.find_cell(0,1)
+        cell = game.find_cell(1, 0)
         expect(game.col_free(1)).to be(cell)
       end
     end
